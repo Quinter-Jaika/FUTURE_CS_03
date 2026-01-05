@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Files - File Manager{% endblock %}
+
+{% block content %}
+<div class="upload-section">
+    <div class="upload-header">
+        <h1><i class="fas fa-cloud-upload-alt"></i> Upload Files</h1>
+        <p class="upload-description">
+            Select files to upload. Maximum file size: 16MB. 
+            <span class="encryption-badge">
+                <i class="fas fa-lock"></i> AES-256 Encryption Available
+            </span>
+        </p>
+    </div>
+
+    <div class="upload-container">
+        <!-- Upload Form -->
+        <form id="uploadForm" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+            <!-- Drag & Drop Area -->
+            <div class="upload-area" id="dropArea">
+                <i class="fas fa-cloud-upload-alt upload-area-icon"></i>
+                <h3>Drag & Drop Files Here</h3>
+                <p>or</p>
+                <div class="file-input-wrapper">
+                    <input type="file" name="file" id="fileInput" class="file-input" multiple>
+                    <label for="fileInput" class="btn btn-primary">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </label>
+                </div>
+                <p class="upload-hint">Supports multiple files, max 16MB each</p>
+            </div>
+            
+            <!-- Encryption Options -->
+            <div class="encryption-options">
+                <div class="encryption-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="encryptToggle" name="encrypt">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">
+                            <i class="fas fa-lock"></i> Encrypt Files with AES-256
+                        </span>
+                    </label>
+                </div>
+                
+                <div id="passwordSection" class="password-section" style="display: none;">
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-key"></i> Encryption Password
+                        </label>
+                        <div class="password-input-group">
+                            <input type="password" 
+                                   id="password" 
+                                   name="password" 
+                                   class="form-control"
+                                   placeholder="Enter a strong password (minimum 8 characters)"
+                                   minlength="8"
+                                   required>
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small class="form-text">
+                            <i class="fas fa-info-circle"></i> 
+                            Remember this password! You'll need it to decrypt the file. No password recovery available.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selected Files Preview -->
+            <div id="selectedFiles" class="selected-files">
+                <div class="selected-files-header">
+                    <h4><i class="fas fa-file"></i> Selected Files</h4>
+                    <span id="fileCount">0 files</span>
+                </div>
+                <div class="file-list" id="fileList">
+                    <!-- Files will be listed here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Upload Button -->
+            <div class="upload-actions">
+                <button type="submit" class="btn btn-primary btn-large" id="uploadBtn" disabled>
+                    <i class="fas fa-upload"></i> Upload Files
+                </button>
+                <button type="button" class="btn btn-secondary btn-large" id="clearBtn">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </div>
+        </form>
+
+        <!-- Upload Progress -->
+        <div id="uploadProgress" class="upload-progress" style="display: none;">
+            <div class="progress-header">
+                <h4><i class="fas fa-spinner fa-spin"></i> Upload Progress</h4>
+                <span id="progressText">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progressBar" class="progress-bar-fill"></div>
+            </div>
+            <div id="uploadStatus" class="upload-status">
+                <i class="fas fa-lock" id="encryptionIcon" style="display: none;"></i>
+                <span id="statusText">Preparing upload...</span>
+            </div>
+        </div>
+
+        <!-- Upload Guidelines -->
+        <div class="upload-guidelines">
+            <h3><i class="fas fa-info-circle"></i> Upload & Encryption Guidelines</h3>
+            <div class="guidelines-grid">
+                <div class="guideline-card">
+                    <div class="guideline-icon security">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h5>AES-256 Encryption</h5>
+                    <p>Military-grade encryption for maximum security. Files are encrypted before storage.</p>
+                </div>
+                <div class="guideline-card">
+                    <div class="guideline-icon size">
+                        <i class="fas fa-weight-hanging"></i>
+                    </div>
+                    <h5>File Size Limit</h5>
+                    <p>Maximum 16MB per file for optimal performance and encryption speed.</p>
+                </div>
+                <div class="guideline-card">
+                    <div class="guideline-icon format">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h5>Supported Formats</h5>
+                    <p>Documents, images, archives, audio, and video files. All file types can be encrypted.</p>
+                </div>
+                <div class="guideline-card">
+                    <div class="guideline-icon password">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h5>Password Security</h5>
+                    <p>Strong passwords (8+ characters) required for encrypted files. Remember your password!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/upload-script.js') }}"></script>
+{% endblock %}

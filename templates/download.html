@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Download Files - File Manager{% endblock %}
+
+{% block content %}
+<div class="download-section">
+    <div class="download-header">
+        <h1><i class="fas fa-cloud-download-alt"></i> Download Files</h1>
+        <p class="download-description">
+            Browse and manage your uploaded files. Encrypted files are marked with 
+            <span class="encryption-indicator"><i class="fas fa-lock"></i> lock icon</span>.
+        </p>
+    </div>
+
+    <!-- Encryption Action Bar -->
+    <div class="encryption-bar">
+        <div class="encryption-stats">
+            <div class="stat">
+                <i class="fas fa-file"></i>
+                <span>Total: {{ files|length }} files</span>
+            </div>
+            <div class="stat">
+                <i class="fas fa-lock"></i>
+                <span>Encrypted: {{ files|selectattr('encrypted')|list|length }}</span>
+            </div>
+            <div class="stat">
+                <i class="fas fa-unlock"></i>
+                <span>Unencrypted: {{ files|rejectattr('encrypted')|list|length }}</span>
+            </div>
+        </div>
+        <div class="encryption-actions">
+            <button class="btn btn-encrypt" id="bulkEncryptBtn" style="display: none;">
+                <i class="fas fa-lock"></i> Encrypt Selected
+            </button>
+            <div class="encryption-toggle">
+                <label class="toggle-switch small">
+                    <input type="checkbox" id="showEncryptedToggle" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Show Encrypted</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Files List -->
+    <div class="files-container">
+        {% if files %}
+            <div class="files-header">
+                <div class="files-info">
+                    <h3>Your Files</h3>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search files..." class="search-input">
+                    </div>
+                </div>
+                <div class="files-filter">
+                    <select id="filterSelect" class="filter-select">
+                        <option value="all">All Files</option>
+                        <option value="encrypted">Encrypted Only</option>
+                        <option value="unencrypted">Unencrypted Only</option>
+                        <option value="images">Images</option>
+                        <option value="documents">Documents</option>
+                        <option value="archives">Archives</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="files-grid" id="filesGrid">
+                {% for file in files %}
+                    <div class="file-card {% if file.encrypted %}encrypted{% endif %}" 
+                         data-filename="{{ file.name }}"
+                         data-encrypted="{{ file.encrypted|lower }}"
+                         data-type="{{ file.type }}">
+                        <div class="file-icon">
+                            {% set extension = file.name.split('.')[-1].lower() %}
+                            {% if extension == 'pdf' %}
+                                <i class="fas fa-file-pdf"></i>
+                            {% elif extension in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'] %}
+                                <i class="fas fa-file-image"></i>
+                            {% elif extension in ['doc', 'docx', 'rtf'] %}
+                                <i class="fas fa-file-word"></i>
+                            {% elif extension in ['xls', 'xlsx', 'csv'] %}
+                                <i class="fas fa-file-excel"></i>
+                            {% elif extension in ['ppt', 'pptx'] %}
+                                <i class="fas fa-file-powerpoint"></i>
+                            {% elif extension in ['zip', 'rar', 'tar', 'gz', '7z'] %}
+                                <i class="fas fa-file-archive"></i>
+                            {% elif extension in ['mp3', 'wav', 'ogg', 'flac'] %}
+                                <i class="fas fa-file-audio"></i>
+                            {% elif extension in ['mp4', 'avi', 'mov', 'mkv'] %}
+                                <i class="fas fa-file-video"></i>
+                            {% elif extension in ['txt', 'md', 'json', 'xml'] %}
+                                <i class="fas fa-file-alt"></i>
+                            {% else %}
+                                <i class="fas fa-file"></i>
+                            {% endif %}
+                            
+                            {% if file.encrypted %}
+                            <div class="encryption-badge">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="file-info">
+                            <div class="file-header">
+                                <h4 class="file-name">{{ file.name }}</h4>
+                                {% if file.encrypted %}
+                                <span class="file-encrypted-label">
+                                    <i class="fas fa-lock"></i> Encrypted
+                                </span>
+                                {% endif %}
+                            </div>
+                            <p class="file-meta">
+                                <span class="file-size">{{ file.size }}</span>
+                                {% if file.encrypted %}
+                                <span class="file-encryption-info">
+                                    <i class="fas fa-shield-alt"></i> AES-256 Protected
+                                </span>
+                                {% endif %}
+                            </p>
+                            <div class="file-actions">
+                                {% if file.encrypted %}
+                                    <a href="{{ url_for('decrypt_file', filename=file.name) }}" 
+                                       class="btn btn-primary download-btn">
+                                        <i class="fas fa-unlock"></i> Decrypt & Download
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('download_file', filename=file.name) }}" 
+                                       class="btn btn-primary download-btn">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                    <button class="btn btn-encrypt encrypt-btn" data-filename="{{ file.name }}">
+                                        <i class="fas fa-lock"></i> Encrypt
+                                    </button>
+                                {% endif %}
+                                <button class="btn btn-danger delete-btn" data-filename="{{ file.name }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add this inside the file card loop to show encryption status -->
+                    {% if file.encrypted %}
+                    <div class="file-encryption-status">
+                        <i class="fas fa-lock"></i>
+                        <span>AES-256 Encrypted</span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="files-footer">
+                <div class="selected-count">
+                    <span id="selectedCount">0</span> files selected
+                </div>
+                <div class="footer-actions">
+                    <button id="selectAllBtn" class="btn btn-secondary">
+                        <i class="fas fa-check-square"></i> Select All
+                    </button>
+                    <button id="clearSelectionBtn" class="btn btn-secondary" style="display: none;">
+                        <i class="fas fa-times"></i> Clear Selection
+                    </button>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3>No Files Available</h3>
+                <p>You haven't uploaded any files yet. Start by uploading some files!</p>
+                <a href="{{ url_for('upload_file') }}" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Upload Files
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Encryption Modal -->
+    <div id="encryptModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-lock"></i> Encrypt File</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Encrypting: <strong id="encryptFileName"></strong></p>
+                <div class="form-group">
+                    <label for="encryptPassword">
+                        <i class="fas fa-key"></i> Encryption Password
+                    </label>
+                    <div class="password-input-group">
+                        <input type="password" 
+                               id="encryptPassword" 
+                               class="form-control"
+                               placeholder="Enter a strong password">
+                        <button type="button" class="password-toggle" id="encryptPasswordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small class="form-text">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        IMPORTANT: Remember this password! You'll need it to decrypt the file.
+                    </small>
+                </div>
+                <div class="password-confirm">
+                    <label for="confirmPassword">
+                        <i class="fas fa-redo"></i> Confirm Password
+                    </label>
+                    <input type="password" 
+                           id="confirmPassword" 
+                           class="form-control"
+                           placeholder="Re-enter the password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary cancel-encrypt">Cancel</button>
+                <button class="btn btn-primary" id="confirmEncryptBtn">
+                    <i class="fas fa-lock"></i> Encrypt File
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="fileNameToDelete"></strong>?</p>
+                <p class="warning-text">This action cannot be undone. The file will be permanently removed.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary cancel-delete">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete File
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="download-actions">
+        <a href="{{ url_for('upload_file') }}" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Upload More Files
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/download-script.js') }}"></script>
+{% endblock %}

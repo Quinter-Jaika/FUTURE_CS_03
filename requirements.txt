@@ -1,0 +1,47 @@
+# ==============================================
+# Secure File Sharing System - Requirements
+# ==============================================
+
+# ====================
+# Web Framework
+# ====================
+Flask==3.0.0                # Main web framework
+Werkzeug==3.0.1             # WSGI utilities, includes secure filename
+Jinja2==3.1.2               # Template engine
+click==8.1.7                # Command line interface (Flask dependency)
+
+# ====================
+# Cryptography
+# ====================
+pycryptodome==3.20.0        # AES encryption implementation
+# OR use cryptography library (more modern)
+cryptography==42.0.5        # Alternative: Modern cryptography library
+
+# ====================
+# File & System
+# ====================
+python-dotenv==1.0.0        # Environment variable management
+python-magic==0.4.27        # File type detection (optional)
+Pillow==10.1.0              # Image processing (if handling images)
+
+# ====================
+# Development Tools
+# ====================
+pytest==7.4.4               # Testing framework
+pytest-flask==1.2.0         # Flask testing utilities
+coverage==7.4.1             # Code coverage
+Faker==22.3.0               # Test data generation
+
+# ====================
+# Security Tools
+# ====================
+bandit==1.7.6               # Security linter
+safety==2.4.0               # Dependency vulnerability scanner
+
+# ====================
+# Code Quality
+# ====================
+black==23.12.1              # Code formatter
+flake8==7.0.0               # Style guide enforcement
+pylint==3.0.3               # Code analysis
+isort==5.13.2               # Import sorting

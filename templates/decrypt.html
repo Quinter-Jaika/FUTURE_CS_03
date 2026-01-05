@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Decrypt File - File Manager{% endblock %}
+
+{% block content %}
+<div class="decrypt-section">
+    <div class="decrypt-header">
+        <h1><i class="fas fa-lock"></i> Decrypt File</h1>
+        <p class="decrypt-description">
+            This file is encrypted. Please enter the password to decrypt and download it.
+        </p>
+    </div>
+
+    <div class="decrypt-container">
+        <div class="decrypt-card">
+            <div class="decrypt-icon">
+                <i class="fas fa-file-lock"></i>
+            </div>
+            
+            <h3>Decrypt: {{ filename }}</h3>
+            <p class="file-info">This file is protected with AES-256 encryption</p>
+            
+            <form method="POST" action="{{ url_for('decrypt_file', filename=filename) }}" class="decrypt-form">
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-key"></i> Decryption Password
+                    </label>
+                    <div class="password-input-group">
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="form-control"
+                               placeholder="Enter the password used for encryption"
+                               required>
+                        <button type="button" class="password-toggle" id="passwordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small class="form-text">Enter the exact password used during encryption</small>
+                </div>
+                
+                <div class="decrypt-actions">
+                    <button type="submit" class="btn btn-primary btn-large">
+                        <i class="fas fa-unlock"></i> Decrypt & Download
+                    </button>
+                    <a href="{{ url_for('download_list') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Files
+                    </a>
+                </div>
+            </form>
+            
+            <div class="decrypt-info">
+                <h4><i class="fas fa-info-circle"></i> Decryption Information</h4>
+                <ul>
+                    <li><i class="fas fa-check"></i> Uses AES-256-CBC encryption</li>
+                    <li><i class="fas fa-check"></i> Password-based key derivation</li>
+                    <li><i class="fas fa-check"></i> Secure salt and IV generation</li>
+                    <li><i class="fas fa-check"></i> File is deleted after download</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password toggle
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('password');
+        
+        if (passwordToggle && passwordInput) {
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? 
+                    '<i class="fas fa-eye"></i>' : 
+                    '<i class="fas fa-eye-slash"></i>';
+            });
+        }
+        
+        // Form validation
+        const form = document.querySelector('.decrypt-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const password = passwordInput.value.trim();
+                if (!password) {
+                    e.preventDefault();
+                    alert('Please enter a password');
+                    return false;
+                }
+                
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Decrypting...';
+                submitBtn.disabled = true;
+                
+                // Re-enable button after 5 seconds if still on page
+                setTimeout(() => {
+                    if (submitBtn.disabled) {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                }, 5000);
+                
+                return true;
+            });
+        }
+    });
+</script>
+{% endblock %}

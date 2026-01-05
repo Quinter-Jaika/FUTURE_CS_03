@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Home - File Manager{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <h1><i class="fas fa-shield-alt"></i> Secure File Manager</h1>
+        <p class="hero-description">
+            Upload, encrypt, and manage your files securely with AES-256 encryption. 
+            Protect sensitive documents with military-grade encryption.
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('upload_file') }}" class="btn btn-primary btn-large">
+                <i class="fas fa-upload"></i> Upload Files
+            </a>
+            <a href="{{ url_for('download_list') }}" class="btn btn-secondary btn-large">
+                <i class="fas fa-download"></i> View Files
+            </a>
+        </div>
+    </div>
+    
+    <div class="hero-features">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3>AES-256 Encryption</h3>
+            <p>Military-grade encryption for maximum security. Your files are protected with industry-standard encryption.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h3>Easy Upload</h3>
+            <p>Drag & drop or browse files. Support for multiple files up to 16MB each with real-time progress.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-key"></i>
+            </div>
+            <h3>Password Protection</h3>
+            <p>Set custom passwords for encrypted files. No one can access your files without the correct password.</p>
+        </div>
+    </div>
+</div>
+
+<div class="info-section">
+    <div class="info-content">
+        <h2><i class="fas fa-info-circle"></i> How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h4>Upload Files</h4>
+                <p>Select files from your computer or drag & drop them into the upload area.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h4>Choose Encryption</h4>
+                <p>Optionally encrypt files with a strong password before uploading.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h4>Manage Files</h4>
+                <p>View, download, encrypt, or delete files from your personal file list.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h4>Download Securely</h4>
+                <p>Encrypted files require password entry before downloading.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="security-section">
+    <h2><i class="fas fa-shield-alt"></i> Security Features</h2>
+    <div class="security-features">
+        <div class="security-item">
+            <i class="fas fa-user-shield"></i>
+            <span>End-to-End Encryption</span>
+        </div>
+        <div class="security-item">
+            <i class="fas fa-trash-alt"></i>
+            <span>Secure File Deletion</span>
+        </div>
+        <div class="security-item">
+            <i class="fas fa-clock"></i>
+            <span>No File Expiration</span>
+        </div>
+        <div class="security-item">
+            <i class="fas fa-server"></i>
+            <span>Local Storage Only</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
